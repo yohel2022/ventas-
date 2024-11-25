@@ -1,0 +1,126 @@
+<!-- src/app/modules/products/product-form/product-form.component.html -->
+<div class="max-w-3xl mx-auto bg-white rounded-lg shadow">
+    <!-- Header -->
+    <div class="px-6 py-4 border-b border-gray-200">
+        <h2 class="text-xl font-semibold text-gray-800">
+            {{ isEditing ? 'Editar' : 'Crear' }} Producto
+        </h2>
+    </div>
+
+    <!-- Loading State -->
+    @if (isLoading) {
+    <div class="p-8 text-center">
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
+        <p class="mt-2 text-gray-600">Cargando...</p>
+    </div>
+    }
+
+    <!-- Error Message -->
+    @if (errorMessage) {
+    <div class="m-4 p-4 bg-red-50 border border-red-200 rounded-md">
+        <p class="text-red-600">{{ errorMessage }}</p>
+    </div>
+    }
+
+    <!-- Form -->
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="p-6 space-y-6">
+        <!-- Name Field -->
+        <div>
+            <label for="name" class="block text-sm font-medium text-gray-700">
+                Nombre *
+            </label>
+            <input type="text" id="name" formControlName="name"
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                [class.border-red-500]="hasError('name')">
+            @if (hasError('name')) {
+            <p class="mt-1 text-sm text-red-600">{{ getErrorMessage('name') }}</p>
+            }
+        </div>
+
+        <!-- Description Field -->
+        <div>
+            <label for="description" class="block text-sm font-medium text-gray-700">
+                Descripción *
+            </label>
+            <textarea id="description" formControlName="description" rows="3"
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                [class.border-red-500]="hasError('description')"></textarea>
+            @if (hasError('description')) {
+            <p class="mt-1 text-sm text-red-600">{{ getErrorMessage('description') }}</p>
+            }
+        </div>
+
+        <!-- Category Field -->
+        <div>
+            <label for="categoryId" class="block text-sm font-medium text-gray-700">
+                Categoría *
+            </label>
+            <select id="categoryId" formControlName="categoryId"
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                [class.border-red-500]="hasError('categoryId')">
+                <option value="">Select a category</option>
+                @for (category of categories; track category.id) {
+                <option [value]="category.id">{{ category.name }}</option>
+                }
+            </select>
+            @if (hasError('categoryId')) {
+            <p class="mt-1 text-sm text-red-600">{{ getErrorMessage('categoryId') }}</p>
+            }
+        </div>
+
+        <!-- Price and Stock Fields -->
+        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+            <!-- Price Field -->
+            <div>
+                <label for="price" class="block text-sm font-medium text-gray-700">
+                    Precio *
+                </label>
+                <div class="mt-1 relative rounded-md shadow-sm">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <span class="text-gray-500 sm:text-sm">$</span>
+                    </div>
+                    <input type="number" id="price" formControlName="price" min="0" step="0.01"
+                        class="pl-7 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                        [class.border-red-500]="hasError('price')">
+                </div>
+                @if (hasError('price')) {
+                <p class="mt-1 text-sm text-red-600">{{ getErrorMessage('price') }}</p>
+                }
+            </div>
+
+            <!-- Stock Field -->
+            <div>
+                <label for="stock" class="block text-sm font-medium text-gray-700">
+                    Stock *
+                </label>
+                <input type="number" id="stock" formControlName="stock" min="0"
+                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                    [class.border-red-500]="hasError('stock')">
+                @if (hasError('stock')) {
+                <p class="mt-1 text-sm text-red-600">{{ getErrorMessage('stock') }}</p>
+                }
+            </div>
+        </div>
+
+        <!-- Status Field -->
+        <div class="flex items-center">
+            <input type="checkbox" id="status" formControlName="status"
+                class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+            <label for="status" class="ml-2 block text-sm text-gray-700">
+                ¿Activo?
+            </label>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="flex justify-end space-x-3 pt-4">
+            <button type="button" (click)="cancel()"
+                class="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                Cancel
+            </button>
+            <button type="submit" [disabled]="form.invalid || isLoading"
+                class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed">
+                {{ isEditing ? 'Actualizar' : 'Crear' }}
+            </button>
+        </div>
+    </form>
+</div>

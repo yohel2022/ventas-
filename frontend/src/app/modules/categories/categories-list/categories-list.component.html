@@ -1,0 +1,92 @@
+<!-- src/app/modules/categories/categories-list/categories-list.component.html -->
+<div class="bg-white rounded-lg shadow">
+    <!-- Header -->
+    <div class="px-6 py-4 border-b border-gray-200">
+        <div class="flex justify-between items-center">
+            <h2 class="text-xl font-semibold text-gray-800">Categorias</h2>
+            <a routerLink="new"
+                class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors">
+                Agregar Categoría
+            </a>
+        </div>
+    </div>
+
+    <!-- Error Message -->
+    @if (errorMessage) {
+    <div class="p-4 mb-4 bg-red-50 border border-red-200 rounded-md">
+        <p class="text-red-600">{{ errorMessage }}</p>
+    </div>
+    }
+
+    <!-- Loading State -->
+    @if (isLoading) {
+    <div class="p-8 text-center">
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
+        <p class="mt-2 text-gray-600">Loading categories...</p>
+    </div>
+    }
+
+    <!-- Categories Table -->
+    @if (!isLoading && categories.length > 0) {
+    <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Descripción</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones
+                    </th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+                @for (category of categories; track category.id) {
+                <tr [class.opacity-50]="isDeleting(category.id!)">
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm font-medium text-gray-900">{{ category.name }}</div>
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="text-sm text-gray-500">{{ category.description }}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span [class]="category.status ? 
+                    'px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800' : 
+                    'px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800'">
+                            {{ category.status ? 'Active' : 'Inactive' }}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <div class="flex space-x-3">
+                            <a [routerLink]="['edit', category.id]" class="text-blue-600 hover:text-blue-900">
+                                Editar
+                            </a>
+                            <button (click)="deleteCategory(category)" [disabled]="isDeleting(category.id!)"
+                                class="text-red-600 hover:text-red-900 disabled:opacity-50 disabled:cursor-not-allowed">
+                                @if (isDeleting(category.id!)) {
+                                <span class="inline-block animate-pulse">Eliminando...</span>
+                                } @else {
+                                Eliminar
+                                }
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    }
+
+    <!-- Empty State -->
+    @if (!isLoading && categories.length === 0) {
+    <div class="p-8 text-center">
+        <p class="text-gray-500">No categories found.</p>
+        <a routerLink="new" class="mt-4 inline-block text-blue-500 hover:text-blue-600">
+            Add your first category
+        </a>
+    </div>
+    }
+</div>

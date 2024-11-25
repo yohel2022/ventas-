@@ -1,0 +1,174 @@
+<!-- src/app/modules/sales/sale-form/sale-form.component.html -->
+<div class="bg-white rounded-lg shadow">
+    <!-- Header -->
+    <div class="px-6 py-4 border-b border-gray-200">
+        <div class="flex justify-between items-center">
+            <h2 class="text-xl font-semibold text-gray-800">Nueva Venta</h2>
+        </div>
+    </div>
+
+    <!-- Error Message -->
+    @if (errorMessage) {
+    <div class="m-4 p-4 bg-red-50 border border-red-200 rounded-md">
+        <p class="text-red-600">{{ errorMessage }}</p>
+    </div>
+    }
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="p-6 space-y-6">
+        <!-- Client Selection -->
+        <div>
+            <label class="block text-sm font-medium text-gray-700">
+                Cliente *
+            </label>
+            <select formControlName="clientId"
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                <option value="">Seleccione un cliente</option>
+                @for (client of clients; track client.id) {
+                <option [value]="client.id">
+                    {{ client.name }} - {{ client.phone }}
+                </option>
+                }
+            </select>
+        </div>
+
+        <!-- Product Selection -->
+        <div class="bg-gray-50 p-4 rounded-lg">
+            <h3 class="text-lg font-medium text-gray-900 mb-4">Agregar Productos</h3>
+
+            <!-- Product Selector -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Producto
+                    </label>
+                    <select [(ngModel)]="selectedProduct" [ngModelOptions]="{standalone: true}"
+                        class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                        <option [ngValue]="null">Seleccione un producto</option>
+                        @for (product of getAvailableProducts(); track product.id) {
+                        <option [ngValue]="product">
+                            {{ product.name }} (Stock: {{ product.stock }}) - {{ formatPrice(product.price) }}
+                        </option>
+                        }
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Cantidad
+                    </label>
+                    <div class="flex items-center space-x-2">
+                        <button type="button" (click)="tempQuantity = Math.max(1, tempQuantity - 1)"
+                            class="p-2 bg-gray-100 rounded-md hover:bg-gray-200">
+                            -
+                        </button>
+                        <input type="number" [(ngModel)]="tempQuantity" [ngModelOptions]="{standalone: true}" min="1"
+                            [max]="selectedProduct?.stock || 1"
+                            class="block w-20 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-center">
+                        <button type="button"
+                            (click)="tempQuantity = Math.min(selectedProduct?.stock || 1, tempQuantity + 1)"
+                            class="p-2 bg-gray-100 rounded-md hover:bg-gray-200">
+                            +
+                        </button>
+                    </div>
+                </div>
+
+                <div class="flex items-end">
+                    <button type="button" (click)="addProductToSale()" [disabled]="!selectedProduct"
+                        class="w-full bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed">
+                        Agregar Producto
+                    </button>
+                </div>
+            </div>
+
+            <!-- Products Table -->
+            @if (items.length > 0) {
+            <div class="mt-4 overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Producto</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Precio Unit.
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Cantidad</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Subtotal</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        @for (item of items.controls; track $index) {
+                        <tr [formGroup]="item">
+                            <td class="px-6 py-4">
+                                {{ item.get('productName')?.value }}
+                            </td>
+                            <td class="px-6 py-4">
+                                {{ formatPrice(item.get('price')?.value) }}
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="flex items-center space-x-2">
+                                    <button type="button" (click)="updateQuantity($index, -1)"
+                                        class="p-1 bg-gray-100 rounded hover:bg-gray-200">
+                                        -
+                                    </button>
+                                    <span class="w-12 text-center">
+                                        {{ item.get('quantity')?.value }}
+                                    </span>
+                                    <button type="button" (click)="updateQuantity($index, 1)"
+                                        class="p-1 bg-gray-100 rounded hover:bg-gray-200">
+                                        +
+                                    </button>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 font-medium">
+                                {{ formatPrice(item.get('subtotal')?.value) }}
+                            </td>
+                            <td class="px-6 py-4">
+                                <button type="button" (click)="removeItem($index)"
+                                    class="text-red-600 hover:text-red-900">
+                                    Eliminar
+                                </button>
+                            </td>
+                        </tr>
+                        }
+                        <!-- Total Row -->
+                        <tr class="bg-gray-50 font-medium">
+                            <td colspan="3" class="px-6 py-4 text-right">
+                                Total:
+                            </td>
+                            <td class="px-6 py-4 font-bold">
+                                {{ formatPrice(total.toString()) }}
+                            </td>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            } @else {
+            <div class="text-center py-4 text-gray-500">
+                No hay productos agregados a la venta
+            </div>
+            }
+        </div>
+
+        <!-- Observation -->
+        <div>
+            <label class="block text-sm font-medium text-gray-700">
+                Observaciones
+            </label>
+            <textarea formControlName="observation" rows="3"
+                placeholder="Ingrese observaciones adicionales sobre la venta"
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"></textarea>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="flex justify-end space-x-3 pt-4 border-t">
+            <button type="button" routerLink="/sales"
+                class="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                Cancelar
+            </button>
+            <button type="submit" [disabled]="form.invalid || items.length === 0 || isLoading"
+                class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed">
+                {{ isLoading ? 'Guardando...' : 'Crear Venta' }}
+            </button>
+        </div>
+    </form>
+</div>

@@ -1,0 +1,45 @@
+<div class="h-screen flex flex-col">
+  <!-- Header Fijo -->
+  <header class="bg-white shadow-sm z-10">
+    <div class="mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex h-16 items-center justify-between">
+        <!-- Logo -->
+        <div class="flex-shrink-0">
+          <h1 class="text-xl font-bold text-gray-800 uppercase">Sistema de Ventas</h1>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Contenedor Principal -->
+  <div class="flex flex-1 overflow-hidden">
+    <!-- Sidebar Fijo -->
+    <aside class="w-64 bg-gray-800 flex-shrink-0">
+      <nav class="mt-5 px-2">
+        <a routerLink="/categories" routerLinkActive="bg-gray-900 text-white"
+          class="group flex items-center px-2 py-2 text-base font-medium rounded-md text-gray-300 hover:bg-gray-700 hover:text-white">
+          Categorias
+        </a>
+        <a routerLink="/products" routerLinkActive="bg-gray-900 text-white"
+          class="mt-1 group flex items-center px-2 py-2 text-base font-medium rounded-md text-gray-300 hover:bg-gray-700 hover:text-white">
+          Productos
+        </a>
+        <a routerLink="/clients" routerLinkActive="bg-gray-900 text-white"
+          class="mt-1 group flex items-center px-2 py-2 text-base font-medium rounded-md text-gray-300 hover:bg-gray-700 hover:text-white">
+          Clientes
+        </a>
+        <a routerLink="/sales" routerLinkActive="bg-gray-900 text-white"
+          class="mt-1 group flex items-center px-2 py-2 text-base font-medium rounded-md text-gray-300 hover:bg-gray-700 hover:text-white">
+          Ventas
+        </a>
+      </nav>
+    </aside>
+
+    <!-- Contenido con Scroll -->
+    <main class="flex-1 overflow-y-auto bg-gray-100">
+      <div class="container mx-auto p-6">
+        <router-outlet></router-outlet>
+      </div>
+    </main>
+  </div>
+</div>
